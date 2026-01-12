@@ -1,0 +1,12 @@
+{
+  "run_name": "",
+  "git_commit": "",
+  "timestamp_utc": "",
+  "file_path": "",
+  "dset_path": "",
+  "data_shape": "",
+  "windowing": { "win_t": 0, "stride_t": 0, "ch_start": 0, "ch_count": 0, "max_windows": 0, "fs_hz": 0 },
+  "preproc": { "wpd": true, "params": {} },
+  "mae": { "mask_ratio": 0.0, "embed_dim": 0, "depth": 0, "decoder_dim": 0, "epochs": 0, "batch_size": 0 },
+  "notes": ""
+}

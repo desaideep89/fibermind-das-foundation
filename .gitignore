@@ -1,0 +1,44 @@
+# ---- Colab / Jupyter ----
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+*.log
+
+# ---- Python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- Data / artifacts (DO NOT COMMIT) ----
+*.h5
+*.hdf5
+*.npz
+*.npy
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.tfrecord
+*.parquet
+*.zip
+*.csv
+
+# Images and plots (keep in Drive, not git)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.pdf
+
+# ---- Outputs / runs ----
+DAS_Outputs/
+outputs/
+runs/

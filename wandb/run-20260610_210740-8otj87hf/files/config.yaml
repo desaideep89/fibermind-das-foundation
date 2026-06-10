@@ -1,0 +1,68 @@
+_wandb:
+    value:
+        cli_version: 0.27.2
+        e:
+            tzc0wzy7v6r2n5qq4n8mabl4sd5k2jva:
+                codePath: train.py
+                codePathLocal: train.py
+                cpu_count: 128
+                cpu_count_logical: 256
+                cudaVersion: "13.0"
+                disk:
+                    /:
+                        total: "32212254720"
+                        used: "536686592"
+                email: desaid.89@outlook.com
+                executable: /usr/local/bin/python
+                git:
+                    commit: ddfd41d90add2dbd2c897ac1ea4daff83e3def09
+                    remote: https://github.com/desaideep89/fibermind-das-foundation.git
+                gpu: NVIDIA GeForce RTX 3090
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 10496
+                      memoryTotal: "25769803776"
+                      name: NVIDIA GeForce RTX 3090
+                      uuid: GPU-e116e80e-e26d-3efa-2c9f-0abb4cdc5424
+                host: 27bb0645dbe7
+                memory:
+                    total: "1081949790208"
+                os: Linux-6.8.0-107-generic-x86_64-with-glibc2.39
+                program: /workspace/fibermind-das-foundation/train.py
+                python: CPython 3.12.3
+                root: /workspace/fibermind-das-foundation
+                startedAt: "2026-06-10T21:07:40.960068Z"
+                writerId: tzc0wzy7v6r2n5qq4n8mabl4sd5k2jva
+        m:
+            - "1": trainer/global_step
+              "6":
+                - 3
+              "7": []
+            - "2": '*'
+              "5": 1
+              "6":
+                - 1
+              "7": []
+        python_version: 3.12.3
+        t:
+            "1":
+                - 1
+                - 41
+                - 50
+                - 106
+            "2":
+                - 1
+                - 41
+                - 50
+                - 106
+            "3":
+                - 7
+                - 13
+                - 66
+            "4": 3.12.3
+            "5": 0.27.2
+            "12": 0.27.2
+            "13": linux-x86_64
+cfg:
+    value: '{''data'': {''n_per_oem'': 8000, ''val_split'': 0.1}, ''model'': {''win_t'': 512, ''win_c'': 256, ''patch_t'': 16, ''enc_dim'': 128, ''enc_depth'': 4, ''enc_heads'': 4, ''dec_dim'': 64, ''dec_depth'': 2, ''dec_heads'': 4, ''mask_ratio'': 0.75, ''dropout'': 0.0, ''var_floor'': 0.001}, ''training'': {''epochs'': 100, ''batch_size'': 32, ''lr'': 0.001, ''weight_decay'': 0.05, ''num_workers'': 4, ''steps_per_epoch'': 450}, ''wandb'': {''project'': ''fibermind-das'', ''name'': ''two_oem_temporal_mae_v1''}}'

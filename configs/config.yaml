@@ -1,0 +1,32 @@
+defaults:
+  - _self_
+
+data:
+  n_per_oem: 8000
+  val_split: 0.1
+
+model:
+  win_t: 512
+  win_c: 256
+  patch_t: 16
+  enc_dim: 128
+  enc_depth: 4
+  enc_heads: 4
+  dec_dim: 64
+  dec_depth: 2
+  dec_heads: 4
+  mask_ratio: 0.75
+  dropout: 0.0
+  var_floor: 0.001
+
+training:
+  epochs: 100
+  batch_size: 32
+  lr: 1e-3
+  weight_decay: 0.05
+  num_workers: 4
+  steps_per_epoch: 450
+
+wandb:
+  project: fibermind-das
+  name: two_oem_temporal_mae_v1

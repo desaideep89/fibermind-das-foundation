@@ -18,6 +18,7 @@ model:
   mask_ratio: 0.75
   dropout: 0.0
   var_floor: 0.001
+  amplitude_weight: 0.0
 
 training:
   epochs: 100
@@ -28,4 +29,4 @@ training:
 
 wandb:
   project: fibermind-das
-  name: adif_dynamic_strain_v1
+  name: adif_rms_factored_v1

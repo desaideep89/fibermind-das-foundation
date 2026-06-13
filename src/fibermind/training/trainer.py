@@ -24,19 +24,25 @@ class MAELightningModule(L.LightningModule):
             mask_ratio=cfg.model.mask_ratio,
             dropout=cfg.model.dropout,
             var_floor=cfg.model.var_floor,
+            amplitude_weight=cfg.model.amplitude_weight,
         )
 
-    def training_step(self, batch, batch_idx):
-        pred, mask = self.model(batch)
-        loss = self.model.loss(batch, pred, mask)
-        self.log("train/loss", loss, on_step=True, on_epoch=True, prog_bar=True)
+    def _step(self, batch, stage):
+        w = batch["w"]
+        log_rms = batch["log_rms"]
+        pred, mask, amp_pred = self.model(w, log_rms)
+        loss, struct, amp = self.model.loss(w, log_rms, pred, mask, amp_pred)
+        self.log(stage + "/loss", loss, on_epoch=True, prog_bar=True)
+        self.log(stage + "/struct", struct, on_epoch=True)
+        if self.cfg.model.amplitude_weight > 0:
+            self.log(stage + "/amp", amp, on_epoch=True)
         return loss
 
+    def training_step(self, batch, batch_idx):
+        return self._step(batch, "train")
+
     def validation_step(self, batch, batch_idx):
-        pred, mask = self.model(batch)
-        loss = self.model.loss(batch, pred, mask)
-        self.log("val/loss", loss, on_epoch=True, prog_bar=True)
-        return loss
+        return self._step(batch, "val")
 
     def configure_optimizers(self):
         opt = torch.optim.AdamW(
@@ -46,12 +52,10 @@ class MAELightningModule(L.LightningModule):
         )
         steps = len(self.trainer.datamodule.train_ds) // self.cfg.training.batch_size + 1
         scheduler = OneCycleLR(
-            opt,
-            max_lr=self.cfg.training.lr,
+            opt, max_lr=self.cfg.training.lr,
             epochs=self.cfg.training.epochs,
             steps_per_epoch=steps,
-            pct_start=0.05,
-            anneal_strategy="cos",
+            pct_start=0.05, anneal_strategy="cos",
         )
         return [opt], [{"scheduler": scheduler, "interval": "step"}]
 
@@ -69,19 +73,9 @@ class MAEDataModule(L.LightningDataModule):
         print("Train: " + str(n_train) + " | Val: " + str(n_val))
 
     def train_dataloader(self):
-        return DataLoader(
-            self.train_ds,
-            batch_size=self.cfg.training.batch_size,
-            shuffle=True,
-            num_workers=self.cfg.training.num_workers,
-            pin_memory=True,
-        )
+        return DataLoader(self.train_ds, batch_size=self.cfg.training.batch_size,
+                          shuffle=True, num_workers=self.cfg.training.num_workers, pin_memory=True)
 
     def val_dataloader(self):
-        return DataLoader(
-            self.val_ds,
-            batch_size=self.cfg.training.batch_size,
-            shuffle=False,
-            num_workers=self.cfg.training.num_workers,
-            pin_memory=True,
-        )
+        return DataLoader(self.val_ds, batch_size=self.cfg.training.batch_size,
+                          shuffle=False, num_workers=self.cfg.training.num_workers, pin_memory=True)

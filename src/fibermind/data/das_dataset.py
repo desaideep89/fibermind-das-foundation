@@ -1,3 +1,9 @@
+"""
+DAS dataset reading RMS-factored windows.
+Returns w_norm (1, T, C) and log_rms (C,).
+No further normalisation: w_norm is already per-channel unit RMS.
+"""
+
 import os
 import glob
 import numpy as np
@@ -10,7 +16,7 @@ class DASWindowDataset(Dataset):
         self.files = sorted(glob.glob(os.path.join(arr_dir, "*.npz")))
         assert len(self.files) > 0, "No npz files in " + arr_dir
         z = np.load(self.files[0])
-        w = z["w"]
+        w = z["w_norm"]
         z.close()
         print("Dataset: " + str(len(self.files)) + " windows | shape: " + str(w.shape))
 
@@ -19,22 +25,14 @@ class DASWindowDataset(Dataset):
 
     def __getitem__(self, idx):
         z = np.load(self.files[idx])
-        w = z["w"].astype(np.float32)
+        w_norm = z["w_norm"].astype(np.float32)
+        log_rms = z["log_rms"].astype(np.float32)
         z.close()
-        w = self._normalise_window(w)
-        return torch.from_numpy(w).unsqueeze(0)  # (1, T, C)
-
-    @staticmethod
-    def _normalise_window(w, eps=1e-10):
-        lo = np.percentile(w, 1)
-        hi = np.percentile(w, 99)
-        if not np.isfinite(lo) or not np.isfinite(hi) or hi <= lo:
-            m = np.max(np.abs(w)) + eps
-            return np.clip(w / m, -1, 1).astype(np.float32)
-        w = np.clip(w, lo, hi)
-        w = 2 * (w - lo) / (hi - lo + eps) - 1
-        return w.astype(np.float32)
+        # w_norm: (T, C) -> (1, T, C); log_rms: (C,)
+        return {
+            "w": torch.from_numpy(w_norm).unsqueeze(0),
+            "log_rms": torch.from_numpy(log_rms),
+        }
 
 
-# Keep MultiOEMDASDataset as alias for compatibility
 MultiOEMDASDataset = DASWindowDataset

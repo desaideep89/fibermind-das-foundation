@@ -5,7 +5,6 @@ import lightning as L
 from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor
 from lightning.pytorch.loggers import WandbLogger
 from src.fibermind.training.trainer import MAELightningModule, MAEDataModule
-from src.fibermind.training.callbacks import RcloneCheckpointBackup
 
 torch.set_float32_matmul_precision("high")
 
@@ -20,12 +19,12 @@ def main(cfg: DictConfig):
     logger = WandbLogger(
         project=cfg.wandb.project,
         name=cfg.wandb.name,
-        save_dir="/workspace/fibermind-das-foundation",
+        save_dir="/tmp/wandb",
     )
 
     callbacks = [
         ModelCheckpoint(
-            dirpath="checkpoints/",
+            dirpath="/tmp/checkpoints/",
             filename="mae-{epoch:03d}-{val_loss:.4f}",
             monitor="val/loss",
             mode="min",
@@ -33,11 +32,6 @@ def main(cfg: DictConfig):
             save_last=True,
         ),
         LearningRateMonitor(logging_interval="epoch"),
-        RcloneCheckpointBackup(
-            local_dir="checkpoints",
-            remote_dir="gdrive:FiberMind/runs",
-            every_n=5,
-        ),
     ]
 
     trainer = L.Trainer(
@@ -49,6 +43,7 @@ def main(cfg: DictConfig):
         callbacks=callbacks,
         log_every_n_steps=10,
         val_check_interval=1.0,
+        default_root_dir="/tmp/lightning",
     )
 
     trainer.fit(model, data)

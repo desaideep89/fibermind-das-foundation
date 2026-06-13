@@ -3,7 +3,7 @@ import lightning as L
 from torch.utils.data import DataLoader, random_split
 from torch.optim.lr_scheduler import OneCycleLR
 from src.fibermind.models.das_mae import build_das_mae
-from src.fibermind.data.das_dataset import MultiOEMDASDataset
+from src.fibermind.data.das_dataset import DASWindowDataset
 
 
 class MAELightningModule(L.LightningModule):
@@ -29,8 +29,7 @@ class MAELightningModule(L.LightningModule):
     def training_step(self, batch, batch_idx):
         pred, mask = self.model(batch)
         loss = self.model.loss(batch, pred, mask)
-        self.log("train/loss", loss, on_step=True, on_epoch=True,
-                 prog_bar=True)
+        self.log("train/loss", loss, on_step=True, on_epoch=True, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -45,12 +44,14 @@ class MAELightningModule(L.LightningModule):
             lr=self.cfg.training.lr,
             weight_decay=self.cfg.training.weight_decay,
         )
-        steps = self.cfg.training.steps_per_epoch
+        steps = len(self.trainer.datamodule.train_ds) // self.cfg.training.batch_size + 1
         scheduler = OneCycleLR(
-            opt, max_lr=self.cfg.training.lr,
+            opt,
+            max_lr=self.cfg.training.lr,
             epochs=self.cfg.training.epochs,
             steps_per_epoch=steps,
-            pct_start=0.05, anneal_strategy="cos",
+            pct_start=0.05,
+            anneal_strategy="cos",
         )
         return [opt], [{"scheduler": scheduler, "interval": "step"}]
 
@@ -61,15 +62,11 @@ class MAEDataModule(L.LightningDataModule):
         self.cfg = cfg
 
     def setup(self, stage=None):
-        full = MultiOEMDASDataset(
-            win_t=self.cfg.model.win_t,
-            win_c=self.cfg.model.win_c,
-            n_per_oem=self.cfg.data.n_per_oem,
-        )
+        full = DASWindowDataset(arr_dir=self.cfg.data.arr_dir)
         n_val = max(1, int(len(full) * self.cfg.data.val_split))
         n_train = len(full) - n_val
         self.train_ds, self.val_ds = random_split(full, [n_train, n_val])
-        print(f"Train: {n_train} | Val: {n_val}")
+        print("Train: " + str(n_train) + " | Val: " + str(n_val))
 
     def train_dataloader(self):
         return DataLoader(
@@ -78,7 +75,6 @@ class MAEDataModule(L.LightningDataModule):
             shuffle=True,
             num_workers=self.cfg.training.num_workers,
             pin_memory=True,
-            persistent_workers=True,
         )
 
     def val_dataloader(self):
@@ -88,5 +84,4 @@ class MAEDataModule(L.LightningDataModule):
             shuffle=False,
             num_workers=self.cfg.training.num_workers,
             pin_memory=True,
-            persistent_workers=True,
         )

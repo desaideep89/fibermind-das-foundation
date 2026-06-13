@@ -2,7 +2,7 @@ defaults:
   - _self_
 
 data:
-  n_per_oem: 8000
+  arr_dir: /data/arrays
   val_split: 0.1
 
 model:
@@ -25,8 +25,7 @@ training:
   lr: 1e-3
   weight_decay: 0.05
   num_workers: 4
-  steps_per_epoch: 450
 
 wandb:
   project: fibermind-das
-  name: two_oem_temporal_mae_v1
+  name: adif_dynamic_strain_v1

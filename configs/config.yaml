@@ -19,6 +19,9 @@ model:
   dropout: 0.0
   var_floor: 0.001
   amplitude_weight: 0.0
+  use_cross_channel: true
+  k_neighbours: 8
+  global_downsample: 32
 
 training:
   epochs: 100
@@ -29,4 +32,4 @@ training:
 
 wandb:
   project: fibermind-das
-  name: adif_rms_factored_v1
+  name: adif_stageB_crosschannel_v1

@@ -25,6 +25,9 @@ class MAELightningModule(L.LightningModule):
             dropout=cfg.model.dropout,
             var_floor=cfg.model.var_floor,
             amplitude_weight=cfg.model.amplitude_weight,
+            use_cross_channel=cfg.model.use_cross_channel,
+            k_neighbours=cfg.model.k_neighbours,
+            global_downsample=cfg.model.global_downsample,
         )
 
     def _step(self, batch, stage):

@@ -42,3 +42,7 @@ Thumbs.db
 DAS_Outputs/
 outputs/
 runs/
+
+# ---- Tooling ----
+.pytest_cache/
+.ruff_cache/
